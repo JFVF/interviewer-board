@@ -48,14 +48,7 @@ export default function InterviewersTab({ interviewers, allSkills, reload }) {
 
   return (
     <div className="tab-panel">
-      <div className="tab-toolbar">
-        <TagInput
-          label="Skill"
-          value={skillFilter}
-          onChange={setSkillFilter}
-          suggestions={allSkills}
-          placeholder="Filter by skill, press tab to add"
-        />
+      <div className="tab-toolbar tab-toolbar-stacked">
         <div className="tab-toolbar-actions">
           <input ref={fileInputRef} type="file" accept=".csv" hidden onChange={handleImport} />
           <button className="link-btn" onClick={() => fileInputRef.current?.click()}>
@@ -71,6 +64,13 @@ export default function InterviewersTab({ interviewers, allSkills, reload }) {
             <Plus size={15} /> Add
           </button>
         </div>
+        <TagInput
+          label="Skill"
+          value={skillFilter}
+          onChange={setSkillFilter}
+          suggestions={allSkills}
+          placeholder="Filter by skill, press tab to add"
+        />
       </div>
       <p className="helper-text">
         CSV needs a "name" column and an optional "stack" column (skills separated by ; or ,).
@@ -97,8 +97,10 @@ export default function InterviewersTab({ interviewers, allSkills, reload }) {
           ) : (
             <div className="row-card" key={interviewer.id}>
               <div className="row-card-header">
-                <span className={`dot ${interviewer.available ? 'dot-available' : 'dot-busy'}`} />
-                <h3>{interviewer.name}</h3>
+                <div className="row-card-title">
+                  <span className={`dot ${interviewer.available ? 'dot-available' : 'dot-busy'}`} />
+                  <h3>{interviewer.name}</h3>
+                </div>
                 <div className="row-card-actions">
                   <button className="icon-btn" onClick={() => setEditingId(interviewer.id)} aria-label="Edit">
                     <Pencil size={16} />

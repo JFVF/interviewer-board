@@ -10,15 +10,15 @@ stack each person covers, and where each candidate is in the process.
 
 ## Running the backend
 
-Requires a JDK 17+ (not installed in the environment this was scaffolded in — verify locally).
+Requires a JDK 17+.
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-Runs on `http://localhost:8080`, with an H2 in-memory database (no setup needed). The H2
-console is available at `http://localhost:8080/h2-console` (JDBC URL
+Runs on `http://localhost:8081`, with an H2 in-memory database (no setup needed). The H2
+console is available at `http://localhost:8081/h2-console` (JDBC URL
 `jdbc:h2:mem:interviewboard`, user `sa`, empty password).
 
 To use Postgres instead, set `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` and run with the
@@ -41,6 +41,16 @@ SPRING_PROFILES_ACTIVE=postgres DB_URL=jdbc:postgresql://localhost:5432/intervie
 An interviewer is "available" when none of their assigned candidates are in an active status
 (`SCHEDULING` or `SCHEDULED`).
 
+### Tests
+
+```bash
+cd backend
+./mvnw test
+```
+
+JUnit 5 + Mockito unit tests for `InterviewerService` and `CandidateService` (including the
+availability logic and CSV import parsing), plus a `@WebMvcTest` for `InterviewerController`.
+
 ## Running the frontend
 
 ```bash
@@ -49,18 +59,24 @@ npm install
 npm run dev
 ```
 
-Runs on `http://localhost:5173` and expects the backend on `http://localhost:8080` (override
+Runs on `http://localhost:3000` and expects the backend on `http://localhost:8081` (override
 with `VITE_API_URL`). CORS is already configured on the backend for this origin.
+
+### Tests
+
+```bash
+cd frontend
+npm test
+```
+
+Vitest + React Testing Library, covering `TagInput`, `StatusFilter`, `AssignInterviewers`,
+`InterviewerToggleChips`, and the `api` client's fetch handling.
 
 ## Status
 
 Phase 0 (scaffold) and Phase 1 (data model) are done, wired end-to-end: interviewer/candidate
 CRUD, skill filters, availability, status badges, and CSV import for interviewers all talk to
-the real API instead of in-memory state.
-
-Not yet verified against a running JDK — no Java toolchain was available in the environment
-this was built in. Before relying on it, run `cd backend && ./mvnw test` and
-`./mvnw spring-boot:run` locally to confirm it compiles and starts.
+the real API instead of in-memory state. Both backend and frontend have unit test coverage.
 
 Next up per the original plan: Phase 3 (multi-user/auth, if needed) and the Phase 4 feature
 backlog (job-title filter, calendar view, candidate CSV import/export, skill-mismatch warnings,
