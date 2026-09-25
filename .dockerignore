@@ -1,0 +1,10 @@
+# Build context for the root Dockerfile (single image).
+.git
+.agents
+.github
+**/node_modules
+frontend/dist
+backend/target
+**/*.db
+**/*.db-journal
+**/*.log
