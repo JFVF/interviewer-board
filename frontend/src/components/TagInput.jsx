@@ -5,17 +5,19 @@ export default function TagInput({ label, value, onChange, suggestions, placehol
   const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
 
+  const hasTag = (tag) => value.some((v) => v.toLowerCase() === tag.toLowerCase());
+
   const filtered = useMemo(() => {
     if (!text) return [];
     const lower = text.toLowerCase();
     return suggestions
-      .filter((s) => !value.includes(s) && s.toLowerCase().includes(lower))
+      .filter((s) => !value.some((v) => v.toLowerCase() === s.toLowerCase()) && s.toLowerCase().includes(lower))
       .slice(0, 8);
   }, [text, suggestions, value]);
 
   function addTag(tag) {
     const trimmed = tag.trim();
-    if (trimmed && !value.includes(trimmed)) {
+    if (trimmed && !hasTag(trimmed)) {
       onChange([...value, trimmed]);
     }
     setText('');

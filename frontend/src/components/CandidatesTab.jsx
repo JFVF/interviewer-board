@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Pencil, Trash2, Plus, Calendar } from 'lucide-react';
+import { Pencil, Trash2, Plus } from 'lucide-react';
 import TagInput from './TagInput.jsx';
 import StatusFilter from './StatusFilter.jsx';
 import StatusBadge from './StatusBadge.jsx';
+import InterviewDatePicker from './InterviewDatePicker.jsx';
 import CandidateForm from './CandidateForm.jsx';
 import AssignInterviewers from './AssignInterviewers.jsx';
 import { api } from '../api.js';
@@ -53,6 +54,11 @@ export default function CandidatesTab({ candidates, interviewers, allSkills, rel
 
   async function handleStatusChange(id, status) {
     await api.candidates.updateStatus(id, status);
+    reload();
+  }
+
+  async function handleDateChange(candidate, interviewDate) {
+    await api.candidates.update(candidate.id, { ...candidate, interviewDate });
     reload();
   }
 
@@ -139,11 +145,10 @@ export default function CandidatesTab({ candidates, interviewers, allSkills, rel
                   onChange={(ids) => handleAssignChange(candidate, ids)}
                 />
                 <div className="candidate-row-meta">
-                  {candidate.interviewDate && (
-                    <span className="date-chip">
-                      <Calendar size={13} /> {candidate.interviewDate}
-                    </span>
-                  )}
+                  <InterviewDatePicker
+                    value={candidate.interviewDate}
+                    onChange={(date) => handleDateChange(candidate, date)}
+                  />
                   <StatusBadge status={candidate.status} onChange={(s) => handleStatusChange(candidate.id, s)} />
                 </div>
               </div>

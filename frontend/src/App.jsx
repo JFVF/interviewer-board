@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import InterviewersTab from './components/InterviewersTab.jsx';
 import CandidatesTab from './components/CandidatesTab.jsx';
+import ReportsTab from './components/ReportsTab.jsx';
 import { api } from './api.js';
 import './App.css';
 
@@ -18,7 +19,7 @@ export default function App() {
       setCandidates(c);
       setError('');
     } catch (e) {
-      setError(e.message || 'Failed to load data. Is the backend running on port 8080?');
+      setError(e.message || 'Failed to load data. Is the backend running on port 8081?');
     } finally {
       setLoading(false);
     }
@@ -47,6 +48,9 @@ export default function App() {
           <button className={tab === 'candidates' ? 'tab active' : 'tab'} onClick={() => setTab('candidates')}>
             Candidates <span className="tab-count">{candidates.length}</span>
           </button>
+          <button className={tab === 'reports' ? 'tab active' : 'tab'} onClick={() => setTab('reports')}>
+            Reports
+          </button>
         </nav>
       </header>
 
@@ -56,13 +60,15 @@ export default function App() {
         <p className="empty-state">Loading…</p>
       ) : tab === 'interviewers' ? (
         <InterviewersTab interviewers={interviewers} allSkills={allSkills} reload={reload} />
-      ) : (
+      ) : tab === 'candidates' ? (
         <CandidatesTab
           candidates={candidates}
           interviewers={interviewers}
           allSkills={allSkills}
           reload={reload}
         />
+      ) : (
+        <ReportsTab interviewers={interviewers} candidates={candidates} />
       )}
     </div>
   );

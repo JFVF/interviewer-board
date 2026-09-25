@@ -176,6 +176,63 @@ body {
   margin-top: 16px;
 }
 
+.role-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.role-group + .role-group {
+  margin-top: 12px;
+}
+
+.role-group-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #4a4e46;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.role-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.role-group-toggle:hover {
+  color: #1f3d33;
+}
+
+.role-group-chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.role-group-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.role-group-count {
+  color: #8a8f86;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 .row-card {
   background: white;
   border: 1px solid #ececE2;
@@ -196,6 +253,16 @@ body {
 .row-card-title {
   display: flex;
   align-items: center;
+}
+
+.role-badge {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e6ede9;
+  color: #1f3d33;
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 .row-card-header h3 {
@@ -280,13 +347,24 @@ body {
   flex-shrink: 0;
 }
 
-.date-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #6b7268;
+.date-picker {
+  border: 1px solid #d7d7cd;
+  border-radius: 999px;
+  background: white;
+  color: #4a4e46;
+  font: inherit;
   font-size: 0.8rem;
-  white-space: nowrap;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.date-picker:hover {
+  border-color: #b9b9ad;
+}
+
+.date-picker:focus {
+  outline: none;
+  border-color: #1f3d33;
 }
 
 .status-badge {
@@ -425,7 +503,7 @@ body {
 .tag-input-field .field-label {
   margin-bottom: 0;
   flex-shrink: 0;
-  width: 66px;
+  width: 84px;
 }
 
 .tag-input-field .tag-input {
@@ -518,15 +596,56 @@ body {
   position: absolute;
   left: 0;
   bottom: calc(100% + 4px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   background: white;
   border: 1px solid #ececE2;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  list-style: none;
-  margin: 0;
   padding: 6px;
   z-index: 10;
-  min-width: 160px;
+  width: 240px;
+  max-width: calc(100vw - 32px);
+}
+
+.assign-search {
+  border: 1px solid #d7d7cd;
+  border-radius: 6px;
+  padding: 7px 9px;
+  font: inherit;
+  font-size: 0.82rem;
+  width: 100%;
+}
+
+.assign-search:focus {
+  outline: none;
+  border-color: #1f3d33;
+}
+
+.assign-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.assign-menu-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.assign-menu-role {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #e6ede9;
+  color: #1f3d33;
+  font-size: 0.66rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .assign-menu-empty {
@@ -625,6 +744,117 @@ body {
   color: #b3261e;
   font-size: 0.82rem;
   margin: 0;
+}
+
+.report-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #1f2421;
+}
+
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.link-btn:disabled {
+  color: #b9bdb3;
+  cursor: default;
+  text-decoration: none;
+}
+
+.report-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.report-sort:hover,
+.report-sort.active {
+  color: #1f2421;
+}
+
+.report-sort-icon {
+  flex-shrink: 0;
+  opacity: 0.45;
+}
+
+.report-sort.active .report-sort-icon {
+  opacity: 1;
+}
+
+.report-table-wrap {
+  overflow-x: auto;
+  background: white;
+  border: 1px solid #ececE2;
+  border-radius: 10px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  color: #4a4e46;
+}
+
+.report-table th,
+.report-table td {
+  padding: 10px 10px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid #f0efe6;
+}
+
+.report-table thead th {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7268;
+}
+
+.report-table tbody th {
+  font-weight: 500;
+  color: #1f2421;
+}
+
+.report-table tbody tr:hover {
+  background: #faf9f4;
+}
+
+.report-table tfoot th,
+.report-table tfoot td {
+  border-bottom: none;
+  border-top: 1px solid #e3e1d8;
+  font-weight: 600;
+  color: #1f2421;
+}
+
+.report-table .report-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.report-status {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+}
+
+.report-total {
+  font-weight: 600;
+  color: #1f2421;
+}
+
+.report-zero {
+  color: #c4c7bd;
 }
 
 .empty-state {

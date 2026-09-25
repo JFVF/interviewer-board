@@ -1,11 +1,4 @@
-const STATUSES = ['SCHEDULING', 'SCHEDULED', 'DONE', 'REJECTED'];
-
-const LABELS = {
-  SCHEDULING: 'Scheduling',
-  SCHEDULED: 'Scheduled',
-  DONE: 'Done',
-  REJECTED: 'Rejected',
-};
+import { STATUSES, STATUS_LABELS as LABELS } from '../statuses.js';
 
 export default function StatusFilter({ value, onChange }) {
   function toggle(status) {

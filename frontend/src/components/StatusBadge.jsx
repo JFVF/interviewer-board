@@ -1,20 +1,5 @@
 import { useState } from 'react';
-
-const STATUSES = ['SCHEDULING', 'SCHEDULED', 'DONE', 'REJECTED'];
-
-const LABELS = {
-  SCHEDULING: 'Scheduling',
-  SCHEDULED: 'Scheduled',
-  DONE: 'Done',
-  REJECTED: 'Rejected',
-};
-
-const CLASSES = {
-  SCHEDULING: 'status-scheduling',
-  SCHEDULED: 'status-scheduled',
-  DONE: 'status-done',
-  REJECTED: 'status-rejected',
-};
+import { STATUSES, STATUS_CLASSES as CLASSES, STATUS_LABELS as LABELS } from '../statuses.js';
 
 export default function StatusBadge({ status, onChange }) {
   const [open, setOpen] = useState(false);

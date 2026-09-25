@@ -9,3 +9,6 @@ frontend/dist/
 # OS / editors
 .DS_Store
 *.log
+
+# Local SQLite database
+*.db

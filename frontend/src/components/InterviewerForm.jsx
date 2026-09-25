@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ROLES } from '../roles.js';
 
 function parseStack(text) {
   return Array.from(
@@ -13,6 +14,7 @@ function parseStack(text) {
 
 export default function InterviewerForm({ interviewer, onSave, onCancel }) {
   const [name, setName] = useState(interviewer?.name ?? '');
+  const [role, setRole] = useState(interviewer?.role ?? '');
   const [stack, setStack] = useState(interviewer?.skills?.join(', ') ?? '');
   const [error, setError] = useState('');
 
@@ -22,7 +24,7 @@ export default function InterviewerForm({ interviewer, onSave, onCancel }) {
       setError('Name is required.');
       return;
     }
-    onSave({ ...interviewer, name: name.trim(), skills: parseStack(stack) });
+    onSave({ ...interviewer, name: name.trim(), role: role || null, skills: parseStack(stack) });
   }
 
   return (
@@ -34,6 +36,19 @@ export default function InterviewerForm({ interviewer, onSave, onCancel }) {
         onChange={(e) => setName(e.target.value)}
         autoFocus
       />
+      <select
+        className="form-input"
+        aria-label="Role"
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+      >
+        <option value="">No role</option>
+        {ROLES.map((r) => (
+          <option key={r.value} value={r.value}>
+            {r.label}
+          </option>
+        ))}
+      </select>
       <input
         className="form-input"
         placeholder="Stack, comma separated"
