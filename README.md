@@ -75,6 +75,57 @@ Vitest + React Testing Library, covering `TagInput`, `StatusFilter`, `AssignInte
 `InterviewerToggleChips`, `InterviewerForm`, the interviewer skill/role filter, and the `api`
 client's fetch handling.
 
+## Running with Docker
+
+The whole app runs as **one image and one container**: the root `Dockerfile` builds the React
+frontend, bundles it into the Spring Boot jar, and Spring Boot serves both the page and `/api` on
+port 8081. The image contains no data; the SQLite database is created empty on first start.
+
+```bash
+docker compose up --build -d     # http://localhost:3000
+docker compose logs -f app       # follow logs
+docker compose down              # stop; data is kept
+docker compose down -v           # stop and DELETE the database
+```
+
+Without compose:
+
+```bash
+docker run -d -p 3000:8081 -v interview-board-data:/data interview-board:latest
+```
+
+- The database lives in a Docker volume mounted at `/data` (`interviewer-board_data` when using
+  compose). It survives restarts and rebuilds. Always mount a volume there, or the data is lost when
+  the container is removed.
+- Back up the database: `docker compose cp app:/data/interviewboard.db ./backup.db`.
+- To seed an empty volume with an existing database file, copy it in **before the first start**.
+  The copy runs as the container's user, so the app can write to it:
+
+  ```bash
+  docker compose up --no-start
+  docker compose run --rm --no-deps \
+    -v "$PWD/backend/interviewboard.db:/seed/interviewboard.db:ro" \
+    --entrypoint sh app -c 'cp /seed/interviewboard.db /data/interviewboard.db'
+  docker compose up -d
+  ```
+
+- The image build skips tests; run `./mvnw test` and `npm test` separately.
+
+### Publishing to Docker Hub
+
+The image is multi-arch (`linux/amd64` and `linux/arm64`, so it also runs on Apple Silicon). Both
+build stages run on the build machine's own platform and the final stage only copies files, so no
+emulation is needed. Build and push in one step (a multi-arch image is pushed as a manifest list):
+
+```bash
+docker login
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -t <namespace>/interview-board:0.1.0 -t <namespace>/interview-board:latest --push .
+```
+
+Anyone can then run it with
+`docker run -d -p 3000:8081 -v interview-board-data:/data <namespace>/interview-board:latest`.
+
 ## Status
 
 Phase 0 (scaffold) and Phase 1 (data model) are done, wired end-to-end: interviewer/candidate
