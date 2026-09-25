@@ -4,6 +4,7 @@ import com.interviewboard.dto.InterviewerDto;
 import com.interviewboard.model.Candidate;
 import com.interviewboard.model.CandidateStatus;
 import com.interviewboard.model.Interviewer;
+import com.interviewboard.model.InterviewerRole;
 import com.interviewboard.repository.CandidateRepository;
 import com.interviewboard.repository.InterviewerRepository;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,13 +80,16 @@ public class InterviewerService {
             }
             String[] columns = header.split(",");
             int nameIdx = indexOf(columns, "name");
+            int roleIdx = indexOf(columns, "role");
             int stackIdx = indexOf(columns, "stack");
             if (nameIdx < 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CSV must have a 'name' column");
             }
 
             String line;
+            int lineNumber = 1;
             while ((line = reader.readLine()) != null) {
+                lineNumber++;
                 if (line.isBlank()) {
                     continue;
                 }
@@ -95,6 +100,9 @@ public class InterviewerService {
                 }
                 Interviewer interviewer = new Interviewer();
                 interviewer.setName(name);
+                if (roleIdx >= 0 && roleIdx < fields.length) {
+                    interviewer.setRole(parseRole(fields[roleIdx], lineNumber));
+                }
                 if (stackIdx >= 0 && stackIdx < fields.length) {
                     Set<String> skills = new LinkedHashSet<>();
                     for (String skill : fields[stackIdx].split(";")) {
@@ -116,6 +124,19 @@ public class InterviewerService {
         return saved.stream().map(i -> toDto(i, candidates)).collect(Collectors.toList());
     }
 
+    private InterviewerRole parseRole(String value, int lineNumber) {
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        try {
+            return InterviewerRole.valueOf(trimmed.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Unknown role '" + trimmed + "' on line " + lineNumber + " (expected Dev, AT, DevOps or QA)");
+        }
+    }
+
     private int indexOf(String[] columns, String name) {
         for (int i = 0; i < columns.length; i++) {
             if (columns[i].trim().equalsIgnoreCase(name)) {
@@ -132,6 +153,7 @@ public class InterviewerService {
 
     private void applyDto(Interviewer interviewer, InterviewerDto dto) {
         interviewer.setName(dto.getName());
+        interviewer.setRole(dto.getRole());
         interviewer.setSkills(dto.getSkills() != null ? new LinkedHashSet<>(dto.getSkills()) : new LinkedHashSet<>());
     }
 
@@ -141,7 +163,7 @@ public class InterviewerService {
                 .filter(c -> c.getInterviewers().stream()
                         .anyMatch(i -> i.getId().equals(interviewer.getId())))
                 .count();
-        return new InterviewerDto(interviewer.getId(), interviewer.getName(),
+        return new InterviewerDto(interviewer.getId(), interviewer.getName(), interviewer.getRole(),
                 new LinkedHashSet<>(interviewer.getSkills()), activeCandidateCount == 0, (int) activeCandidateCount);
     }
 }

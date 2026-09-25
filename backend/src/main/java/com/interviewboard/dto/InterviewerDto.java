@@ -1,6 +1,7 @@
 package com.interviewboard.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.interviewboard.model.InterviewerRole;
 
 import java.util.Set;
 
@@ -8,6 +9,7 @@ public class InterviewerDto {
 
     private Long id;
     private String name;
+    private InterviewerRole role;
     private Set<String> skills;
     private boolean available;
     private int activeCandidateCount;
@@ -16,9 +18,10 @@ public class InterviewerDto {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DISABLED)
-    public InterviewerDto(Long id, String name, Set<String> skills, boolean available, int activeCandidateCount) {
+    public InterviewerDto(Long id, String name, InterviewerRole role, Set<String> skills, boolean available, int activeCandidateCount) {
         this.id = id;
         this.name = name;
+        this.role = role;
         this.skills = skills;
         this.available = available;
         this.activeCandidateCount = activeCandidateCount;
@@ -38,6 +41,14 @@ public class InterviewerDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public InterviewerRole getRole() {
+        return role;
+    }
+
+    public void setRole(InterviewerRole role) {
+        this.role = role;
     }
 
     public Set<String> getSkills() {

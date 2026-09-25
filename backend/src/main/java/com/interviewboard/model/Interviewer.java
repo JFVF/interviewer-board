@@ -4,6 +4,8 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +25,9 @@ public class Interviewer {
 
     @NotBlank
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    private InterviewerRole role;
 
     @ElementCollection
     @CollectionTable(name = "interviewer_skills", joinColumns = @JoinColumn(name = "interviewer_id"))
@@ -45,6 +50,14 @@ public class Interviewer {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public InterviewerRole getRole() {
+        return role;
+    }
+
+    public void setRole(InterviewerRole role) {
+        this.role = role;
     }
 
     public Set<String> getSkills() {

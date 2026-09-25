@@ -4,6 +4,7 @@ import com.interviewboard.dto.InterviewerDto;
 import com.interviewboard.model.Candidate;
 import com.interviewboard.model.CandidateStatus;
 import com.interviewboard.model.Interviewer;
+import com.interviewboard.model.InterviewerRole;
 import com.interviewboard.repository.CandidateRepository;
 import com.interviewboard.repository.InterviewerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,6 +100,24 @@ class InterviewerServiceTest {
     }
 
     @Test
+    void updateStoresAndReturnsRole() {
+        Interviewer ada = interviewer(1L, "Ada Lovelace", "Java");
+        when(interviewerRepository.findById(1L)).thenReturn(Optional.of(ada));
+        when(interviewerRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(candidateRepository.findAll()).thenReturn(List.of());
+
+        InterviewerDto dto = new InterviewerDto();
+        dto.setName("Ada Lovelace");
+        dto.setRole(InterviewerRole.DEVOPS);
+        dto.setSkills(Set.of("Java"));
+
+        InterviewerDto result = service.update(1L, dto);
+
+        assertThat(ada.getRole()).isEqualTo(InterviewerRole.DEVOPS);
+        assertThat(result.getRole()).isEqualTo(InterviewerRole.DEVOPS);
+    }
+
+    @Test
     void deleteThrowsNotFoundWhenInterviewerDoesNotExist() {
         when(interviewerRepository.existsById(99L)).thenReturn(false);
 
@@ -126,6 +146,37 @@ class InterviewerServiceTest {
         assertThat(imported.get(0).getSkills()).containsExactlyInAnyOrder("Java", "Selenium", "Cucumber");
         assertThat(imported.get(1).getName()).isEqualTo("Alan Turing");
         assertThat(imported.get(1).getSkills()).isEmpty();
+    }
+
+    @Test
+    void importCsvParsesRoleColumnCaseInsensitively() {
+        String csv = "name,role,stack\nGrace Hopper,devops,AWS\nAlan Turing,AT,Java\nAda Lovelace,,React\n";
+        MockMultipartFile file = new MockMultipartFile("file", "interviewers.csv", "text/csv", csv.getBytes());
+
+        when(interviewerRepository.saveAll(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(candidateRepository.findAll()).thenReturn(List.of());
+
+        ArgumentCaptor<List<Interviewer>> captor = ArgumentCaptor.forClass(List.class);
+
+        service.importCsv(file);
+
+        org.mockito.Mockito.verify(interviewerRepository).saveAll(captor.capture());
+        List<Interviewer> imported = captor.getValue();
+
+        assertThat(imported).extracting(Interviewer::getRole)
+                .containsExactly(InterviewerRole.DEVOPS, InterviewerRole.AT, null);
+        assertThat(imported.get(0).getSkills()).containsExactly("AWS");
+    }
+
+    @Test
+    void importCsvWithUnknownRoleIsRejected() {
+        String csv = "name,role\nGrace Hopper,dev\nAlan Turing,manager\n";
+        MockMultipartFile file = new MockMultipartFile("file", "interviewers.csv", "text/csv", csv.getBytes());
+
+        assertThatThrownBy(() -> service.importCsv(file))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("manager")
+                .hasMessageContaining("line 3");
     }
 
     @Test
